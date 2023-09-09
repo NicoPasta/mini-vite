@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "description": "mini-vite",
   "scripts": {
-    "build": "webpack -c ./webpack.config.js"
+    "build": "webpack -c ./webpack.config.cjs"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "type": "module",
   "bin": {
-    "mini-vite": "./bin/index.js"
+    "mini-vite": "./bin/index.cjs"
   },
   "dependencies": {
     "chokidar": "^3.5.3",
