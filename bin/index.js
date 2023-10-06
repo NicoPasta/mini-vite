@@ -1,3 +1,5 @@
 #!/usr/bin/env node
 
-import "../lib/index.cjs";
+// import "../dist/index.js";
+
+import "../src/node/cli.js";

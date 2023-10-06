@@ -1,13 +1,16 @@
-import { Command } from "commander";
+import cac from "cac";
 import { startDevServer } from "./server/index.js";
 
-const comd = new Command();
+const cli = cac();
 
-comd
-  .name("mini-vite")
-  .option("-d, --dev <mode>", "dev mode")
-  .action(async (name, options, command) => {
+cli
+  .command("[root]", "Run the development server")
+  .alias("serve")
+  .alias("dev")
+  .action(async () => {
     await startDevServer();
-  })
-  // .parse(process.argv);
-  .parse();
+  });
+
+cli.help();
+
+const res = cli.parse();
