@@ -1,6 +1,11 @@
 import os from "os";
 import path from "path";
-import { HASH_RE, QEURY_RE, JS_TYPES_RE } from "./constants.js";
+import {
+  HASH_RE,
+  QEURY_RE,
+  JS_TYPES_RE,
+  CLIENT_PUBLIC_PATH,
+} from "./constants.js";
 
 // 替换win的反斜杠
 export function slash(p) {
@@ -34,17 +39,23 @@ export const isJSRequest = (id) => {
 // css请求
 export const isCSSRequest = (id) => cleanUrl(id).endsWith(".css");
 
-export const resolveUrl = async (id, importer, serverContext) => {
-  const resolvedId = await serverContext.pluginContainer.resolveId(
-    id,
-    importer
-  );
-
-  if (resolvedId.id) {
-    // 改写成相对于根服务器的绝对路径
-    return resolvedId.id.slice(serverContext.root.length);
-  }
-};
+// 静态资源请求
 export const isImportRequest = (url) => url.endsWith("?import");
 
+// 获取devserver绝对路径
+export const devServerPath = (fspath, root) =>
+  fspath.startsWith(root + "/")
+    ? "/" + path.posix.relative(root, fspath)
+    : fspath;
+
+// 去掉import
 export const removeImportQuery = (id) => id.replace("?import", "");
+
+// 去掉时间戳
+const timestampRE = /\b\?t=\d{13}&?\b/;
+export function removeTimestampQuery(url) {
+  return url.replace(timestampRE, "");
+}
+
+// 运行时脚本
+export const isInternalRequest = (url) => url === CLIENT_PUBLIC_PATH;

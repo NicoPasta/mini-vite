@@ -8,7 +8,7 @@ export const indexHtmlMiddleware = (serverContext) => {
       const htmlPath = path.resolve(root, "index.html");
 
       if (fs.pathExistsSync(htmlPath)) {
-        const rawHtml = fs.readFileSync(htmlPath);
+        const rawHtml = fs.readFileSync(htmlPath, "utf-8");
 
         let html = rawHtml;
         // 类似于transform

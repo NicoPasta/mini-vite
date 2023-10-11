@@ -1,6 +1,12 @@
 import { BARE_IMPORT_RE, EXTERNAL_TYPES } from "../constants.js";
+import path from "path";
+import fs from "fs-extra";
+import { createPluginContainer } from "../plugins/pluginContainer.js";
+import { resolvePlugins } from "../plugins/resolvePlugins.js";
 
-export function scanPlugin(deps) {
+const root = process.cwd();
+
+export function scanPlugin(deps, ctx) {
   return {
     name: "esbuild:scan-deps",
     setup(build) {
@@ -23,6 +29,21 @@ export function scanPlugin(deps) {
         (resolveInfo) => {
           const { path: id } = resolveInfo;
           deps.add(id);
+        }
+      );
+
+      // 解析绝对路径开头的导入
+      build.onResolve(
+        {
+          filter: /^\/.*$/,
+        },
+        async (resolveInfo) => {
+          const resolved = await ctx.pluginContainer.resolveId(
+            resolveInfo.path
+          );
+          return {
+            path: resolved.id,
+          };
         }
       );
     },

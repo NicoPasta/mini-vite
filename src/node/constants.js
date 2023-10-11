@@ -33,3 +33,13 @@ export const HASH_RE = /#.*$/s;
 
 // 静态资源ext
 export const ASSSETS_EXTENSION = /\.(png|svg|ico|jpg)$/;
+
+// publicDir
+export const MVITE_PUBLIC_DIR = "/public";
+
+// 热更新端口
+export const HMR_PORT = 3001;
+
+// 客户端运行时
+export const CLIENT_PUBLIC_PATH = "/@m-vite/client";
+

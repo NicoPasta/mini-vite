@@ -1,8 +1,12 @@
 import fs from "fs-extra";
 
 export const cssPlugin = () => {
+  let serverContext;
   return {
     name: "m-vite:css-plugin",
+    configServer(s) {
+      serverContext = s;
+    },
     async load(id) {
       if (id.endsWith(".css")) {
         return fs.readFile(id, "utf-8");

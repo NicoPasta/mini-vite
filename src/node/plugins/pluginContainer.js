@@ -21,8 +21,10 @@ export const createPluginContainer = (plugins) => {
         if (plugin.resolveId) {
           const res = await plugin.resolveId.call(ctx, id, importer);
           if (res) {
-            const id = typeof res === "string" ? res : res.id;
-            return { id };
+            if (typeof res === "string") {
+              return { id: res };
+            }
+            return res;
           }
         }
       }

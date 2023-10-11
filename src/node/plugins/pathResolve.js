@@ -1,7 +1,12 @@
 import resolve from "resolve";
 import fs from "fs-extra";
 import path from "path";
-import { cleanUrl, isJSRequest, normalizePath } from "../util.js";
+import {
+  cleanUrl,
+  isJSRequest,
+  normalizePath,
+  removeTimestampQuery,
+} from "../util.js";
 import { SUPPORTED_FILE_TYPE } from "../constants.js";
 
 // 负责请求URL到磁盘绝对目录的转换
@@ -16,34 +21,23 @@ export const resolvePlugin = () => {
       // TODO
       // 考虑绝对路径的ext
       // 绝对路径
+
+      if (id.includes("?t=")) {
+        id = removeTimestampQuery(id);
+      }
+
       if (path.isAbsolute(id)) {
-        if (id === "/__vite_ping") {
-          return id;
-        }
-
-        if (id.endsWith("?import")) {
-          return id;
-        }
-
-        // 是否在cwd中
         if (id.startsWith(serverContext.root)) {
-          if (await fs.pathExists(id)) return { id };
+          // fs绝对路径
+          if (await fs.pathExists(id)) return { id: normalizePath(id) };
         }
 
-        // 解析fs路径
+        // 用id解析fs路径
         let fspath = await tryfsResolve(id, serverContext);
         if (fspath) {
-          return fspath;
+          return { id: normalizePath(fspath) };
         }
 
-        // 静态文件内容请求
-        fspath = path.join(serverContext.root, "public", id);
-        if (await fs.pathExists(fspath)) {
-          return { id: fspath };
-        }
-        // else {
-        //   throw new Error(`file ${id} doesn't esxits`);
-        // }
         // 相对路径
       } else if (id.startsWith(".")) {
         if (!importer) {
@@ -60,7 +54,12 @@ export const resolvePlugin = () => {
             resolve.sync(id, { basedir: path.dirname(importer) })
           );
           if (await fs.pathExists(resolvedId)) {
-            return { id: resolvedId };
+            // const url = resolvedId.slice(serverContext.root.length);
+            return {
+              id: resolvedId,
+              // devserver绝对路径
+              // url,
+            };
           }
         } else {
           // 挨个试
@@ -71,8 +70,10 @@ export const resolvePlugin = () => {
                 resolve.sync(extPath, { basedir: path.dirname(importer) })
               );
               if (await fs.pathExists(resolvedId)) {
+                // const url = resolvedId.slice(serverContext.root.length);
                 return {
                   id: resolvedId,
+                  // url,
                 };
               }
             } catch (e) {

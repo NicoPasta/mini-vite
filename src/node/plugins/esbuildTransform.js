@@ -4,8 +4,12 @@ import path from "path";
 import fs from "fs-extra";
 
 export const esbuildTransfromPlugin = () => {
+  let serverContext;
   return {
     name: "m-vite:esbuildTransfrom",
+    configServer(s) {
+      serverContext = s;
+    },
     async load(id) {
       // 在处理JS的插件里只有JS请求返回文件
       if (isJSRequest(id)) {
@@ -18,6 +22,7 @@ export const esbuildTransfromPlugin = () => {
       }
     },
     async transform(code, id) {
+      if (id.startsWith(serverContext.publicDir)) return;
       if (isJSRequest(id)) {
         const extname = path.extname(id).slice(1);
         const { code: transformedCode, map } = await esbuild.transform(code, {

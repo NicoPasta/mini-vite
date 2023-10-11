@@ -8,9 +8,16 @@ import {
 } from "../../util.js";
 
 export const transformRequest = async (url, serverContext) => {
-  const { pluginContainer } = serverContext;
+  const { pluginContainer, moduleGraph } = serverContext;
+
   // 路径解析
   const resolvedId = await pluginContainer.resolveId(url);
+
+  //模块依赖图从入口开始构建
+  let module = await moduleGraph.getModuleByUrl(url);
+  if (module && module.transformResult) {
+    return module.transformResult;
+  }
 
   let transformResult;
   if (resolvedId?.id) {
@@ -19,11 +26,18 @@ export const transformRequest = async (url, serverContext) => {
     if (typeof code === "object" && code !== null) {
       code = code.code;
     }
+
+    //构建对应的入口模块
+    module = await moduleGraph.ensureEntryFromUrl(url);
+
     if (code) {
       // 代码转译
       transformResult = await pluginContainer.transform(code, resolvedId?.id);
     }
+
+    module.transformResult = transformResult;
   }
+
   return transformResult;
 };
 
@@ -36,6 +50,7 @@ export const transformMiddleware = (serverContext) => {
 
     if (isJSRequest(url) || isCSSRequest(url) || isImportRequest(url)) {
       let result = await transformRequest(url, serverContext);
+
       if (!result) {
         return next();
       }

@@ -11,7 +11,7 @@ import fs from "fs-extra";
 
 const { green } = pkg;
 
-export async function optimize(root) {
+export async function optimize(root, ctx) {
   let entry = "";
   for (let type of SUPPORTED_FILE_TYPE) {
     const res = path.resolve(root, `src/main${type}`);
@@ -31,7 +31,7 @@ export async function optimize(root) {
     bundle: true,
     // 利用esbuild的打包能力遍历入口模块
     write: false,
-    plugins: [scanPlugin(deps)],
+    plugins: [scanPlugin(deps, ctx)],
   });
 
   const res = await esbuild.build({
