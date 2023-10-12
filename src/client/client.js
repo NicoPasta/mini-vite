@@ -55,8 +55,9 @@ export const createHotContext = (ownerPath) => {
     accept(deps, callback) {
       // 这里仅考虑接受自身模块更新的情况
       // import.meta.hot.accept(() => {})
-      if (typeof deps === "function") {
-        acceptDeps([ownerPath], ([mod]) => deps(mod));
+      // 没有deps也要调accpet才会进入热更新依赖图hotModulesMap
+      if (typeof deps === "function" || !deps) {
+        acceptDeps([ownerPath], ([mod]) => deps && deps(mod));
       }
     },
     // 模块不再生效的回调
@@ -88,6 +89,7 @@ const fetchUpdate = async (update) => {
       const [path, query] = dep.split(`?`);
       try {
         // 通过动态 import 拉取最新模块
+        // 时间戳到作用是，让浏览器认为是不同的模块，热更新时重新执行es模块的副作用，比如css更新
         const newMod = await import(
           path + `?t=${timestamp}${query ? `&${query}` : ""}`
         );
@@ -105,3 +107,29 @@ const fetchUpdate = async (update) => {
     console.log(`[m-vite] hot updated: ${path}`);
   };
 };
+
+const sheetsMap = new Map();
+
+// 找到路径对应的DOM，更新innerHtml
+export function updateStyle(id, content) {
+  let style = sheetsMap.get(id);
+  if (!style) {
+    // 添加 style 标签
+    style = document.createElement("style");
+    style.setAttribute("type", "text/css");
+    style.innerHTML = content;
+    document.head.appendChild(style);
+  } else {
+    // 更新 style 标签内容
+    style.innerHTML = content;
+  }
+  sheetsMap.set(id, style);
+}
+
+export function removeStyle(id) {
+  const style = sheetsMap.get(id);
+  if (style) {
+    document.head.removeChild(style);
+  }
+  sheetsMap.delete(id);
+}

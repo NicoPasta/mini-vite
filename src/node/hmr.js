@@ -9,6 +9,7 @@ export const bindingHMREvents = (serverContext) => {
     console.log(`${blue("[hmr]")} ${green(devServerPath(file, root))} changed`);
     // 清除模块依赖图中的缓存
     await moduleGraph.onFileChange(file);
+    // console.log(moduleGraph);
     // 向客户端发送更新信息
     ws.send({
       type: "update",

@@ -110,7 +110,7 @@ export const resolve = async (id, importer, serverContext) => {
 
   const mod = moduleGraph.ensureEntryFromUrl(devServerCleanedId);
 
-  // 热更新后防止浏览器缓存旧请求
+  // 每次热更新后重新走编译流程
   if (mod?.lastHMRTimestamp > 0) {
     devServerCleanedId += `?t=${mod.lastHMRTimestamp}`;
   }
