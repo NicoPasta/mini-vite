@@ -6,7 +6,6 @@ import fs from "fs-extra";
 import { normalizePath } from "../util.js";
 import { createRequire } from "module";
 
-
 const require = createRequire(import.meta.url);
 
 export function preBundlePlugin(deps) {
@@ -55,9 +54,14 @@ export function preBundlePlugin(deps) {
           // cjs
           const mod = require(fspath);
           const keys = Object.keys(mod);
+          // 对于cjs模块，使用代理模块重写入口，因为esbuild只会将cjs模块转为es模块都默认导出
+          // 这么做可以添加es模块都命名导出支持，如
+          // import { useState } from react
           if (mod._esModule && mod.default) {
             const excludeDefault = keys.filter((v) => v !== "default");
-            proxyModule = `export { ${excludeDefault.join(",")} } from "${fspath}"
+            proxyModule = `export { ${excludeDefault.join(
+              ","
+            )} } from "${fspath}"
             export default require("${fspath}").default
             `;
           } else {
