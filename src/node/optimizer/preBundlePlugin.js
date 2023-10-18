@@ -1,5 +1,5 @@
 import { BARE_IMPORT_RE, EXTERNAL_TYPES } from "../constants.js";
-import { init, parse } from "es-module-lexer";
+import { parse } from "es-module-lexer";
 import path from "path";
 import resolve from "resolve";
 import fs from "fs-extra";

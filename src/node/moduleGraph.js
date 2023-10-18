@@ -122,11 +122,8 @@ export class ModuleGraph {
   async resolve(rawUrl) {
     // 去掉时间戳和？import
     const cleanUrl = removeImportQuery(removeTimestampQuery(rawUrl));
-
     const resolvedId = await this._resolve(cleanUrl);
-
     const id = resolvedId.id ?? resolvedId;
-
     return { id, url: cleanUrl };
   }
 }

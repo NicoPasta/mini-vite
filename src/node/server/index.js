@@ -10,7 +10,7 @@ import {
   servePublicMiddleware,
   serveStaticMiddleware,
 } from "./middlewares/static.js";
-import chokidar, { FSWatcher } from "chokidar";
+import chokidar from "chokidar";
 import { MVITE_PUBLIC_DIR } from "../constants.js";
 import { ModuleGraph } from "../moduleGraph.js";
 import { createWebSocketServer } from "../ws.js";

@@ -13,7 +13,7 @@ export const createWebSocketServer = () => {
     // 告诉客户端ws已经连上了
     socket.send(JSON.stringify({ type: "connected" }));
   });
-  wss.on("error", (error) => {
+  wss.on("error", () => {
     console.error(red(`WebSocket server error:\n${JSON.stringify(e)}`));
   });
 

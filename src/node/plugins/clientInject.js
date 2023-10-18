@@ -19,22 +19,23 @@ export function clientInjectPlugin() {
     },
     async load(id) {
       if (id === CLIENT_PUBLIC_PATH) {
-        // const fspath = path.join(
-        //   serverContext.root,
-        // "node_modules"
-        //   "mini-vite",
-        //   "dist",
-        //   // nobundle运行时需要es模块进行加载
-        //   "client.mjs"
-        // );
         const fspath = path.join(
           serverContext.root,
-          "../src",
-          "client",
+          "node_modules",
+          "mini-vite",
+          "dist",
+          // nobundle运行时需要es模块进行加载
           "client.js"
         );
+        // const fspath = path.join(
+        //   serverContext.root,
+        //   "../src",
+        //   "client",
+        //   "client.js"
+        // );
 
         const code = await fs.readFile(fspath, "utf-8");
+        // 将代码中的环境变量替换为对应值
         return {
           code: code.replace("__HMR_PORT__", HMR_PORT),
         };

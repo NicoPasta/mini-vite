@@ -5,7 +5,6 @@ import pkg from "picocolors";
 import { scanPlugin } from "./scanPlugin.js";
 import { PRE_BUNDLE_DIR, SUPPORTED_FILE_TYPE } from "../constants.js";
 import { preBundlePlugin } from "./preBundlePlugin.js";
-import resolve from "resolve";
 
 import fs from "fs-extra";
 
@@ -15,7 +14,7 @@ export async function optimize(root, ctx) {
   let entry = "";
   for (let type of SUPPORTED_FILE_TYPE) {
     const res = path.resolve(root, `src/main${type}`);
-    if (fs.pathExistsSync(res)) {
+    if (await fs.pathExists(res)) {
       entry = res;
       break;
     }
@@ -37,9 +36,8 @@ export async function optimize(root, ctx) {
   const res = await esbuild.build({
     entryPoints: [...deps],
     bundle: true,
-    // 利用esbuild的打包能力遍历入口模块
     write: true,
-    // .mini-vite文件夹
+    // .m-vite文件夹
     format: "esm",
     splitting: true,
     outdir: path.resolve(root, PRE_BUNDLE_DIR),

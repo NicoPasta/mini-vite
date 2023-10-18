@@ -33,7 +33,6 @@ export const importAnalysis = () => {
         return null;
       }
       const importedModules = new Set();
-
       const [imports] = parse(code);
       const ms = new MagicString(code);
 
@@ -94,26 +93,20 @@ export const importAnalysis = () => {
 export const resolve = async (id, importer, serverContext) => {
   const { pluginContainer, moduleGraph, root } = serverContext;
   const resolved = await pluginContainer.resolveId(id, normalizePath(importer));
-
   if (!resolved) return;
 
   // assets不纳入依赖图
   if (id.match(ASSSETS_EXTENSION)) {
     return resolved.id.slice(root.length);
   }
-
   // 去掉查询参数后才能去模块依赖图找模块
   let cleanedId = cleanUrl(resolved.id);
-
   // key为devserver路径
   let devServerCleanedId = cleanedId.slice(root.length);
-
   const mod = moduleGraph.ensureEntryFromUrl(devServerCleanedId);
-
   // 每次热更新后重新走编译流程
   if (mod?.lastHMRTimestamp > 0) {
     devServerCleanedId += `?t=${mod.lastHMRTimestamp}`;
   }
-
   return devServerCleanedId;
 };
