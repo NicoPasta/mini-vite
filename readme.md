@@ -5,6 +5,8 @@ dev-server 的 mini 实现，包括了依赖扫描和预构建，nobundle 模块
 #### 使用说明
 
 ```
+$ npm i 
+$ npm run build
 $ cd playground
 $ npm i
 $ npm run dev
