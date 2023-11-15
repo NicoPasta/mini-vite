@@ -10,14 +10,14 @@ import {
 export const transformRequest = async (url, serverContext) => {
   const { pluginContainer, moduleGraph } = serverContext;
 
-  // 路径解析
-  const resolvedId = await pluginContainer.resolveId(url);
-
   //模块依赖图从入口开始构建
   let module = await moduleGraph.getModuleByUrl(url);
   if (module && module.transformResult) {
     return module.transformResult;
   }
+
+  // 路径解析
+  const resolvedId = await pluginContainer.resolveId(url);
 
   let transformResult;
   if (resolvedId?.id) {

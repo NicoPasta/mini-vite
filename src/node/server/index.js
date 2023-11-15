@@ -51,7 +51,7 @@ export async function startDevServer() {
   // 开发模式下configServer钩子
   for (const plugin of plugins) {
     if (plugin.configServer) {
-      await plugin.configServer(serverContext);
+      plugin.configServer(serverContext);
     }
   }
 

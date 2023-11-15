@@ -15,7 +15,7 @@ export function preBundlePlugin(deps) {
       // 忽略的文件类型
       build.onResolve(
         { filter: new RegExp(`\\.(${EXTERNAL_TYPES.join("|")})$`) },
-        (resolveInfo) => {
+        () => {
           return {
             external: true,
           };

@@ -18,7 +18,6 @@ export class ModuleNode {
 export class ModuleGraph {
   // 原始请求url
   urlToModuleMap = new Map();
-  // idToModuleMap = new Map();
   // 绝对路径文件地址
   fileToModulesMap = new Map();
   constructor(resolveId) {
@@ -52,6 +51,7 @@ export class ModuleGraph {
     }
   }
 
+  // 初始化url对应的模块
   async ensureEntryFromUrl(rawUrl) {
     const { id: resolvedId, url } = await this.resolve(rawUrl);
     if (this.urlToModuleMap.has(url)) {
@@ -63,7 +63,6 @@ export class ModuleGraph {
     mod.file = resolvedId;
     // 请求url到module
     this.urlToModuleMap.set(url, mod);
-    // this.idToModuleMap.set(resolvedId, mod);
     // 绝对路径到modules
     let fileMappedModules = this.fileToModulesMap.get(resolvedId);
     if (!fileMappedModules) {
@@ -90,10 +89,13 @@ export class ModuleGraph {
     // 删掉失效的依赖关系
     for (const prevMod of prevImports) {
       if (!importedModules.has(prevMod.url)) {
-        prevMod.importers.delete(prevMod);
+        // 如果新的imported中不存在这个module了，在模块依赖图中删除对应module的importer
+        prevMod.importers.delete(currentMod);
+        // 找到废弃的url
         const tobeDelete = [...currentMod.importedModules].find(
           (m) => m.url === prevMod.url
         );
+        // 删除
         currentMod.importedModules.delete(tobeDelete);
       }
     }
@@ -115,6 +117,7 @@ export class ModuleGraph {
     mod.transformResult = null;
     // 所有引用链上的模块
     mod.importers.forEach((importer) => {
+      // 递归，所有模块引用链上的模块都需要重新编译
       this.onFileChange(importer.id);
     });
   }
